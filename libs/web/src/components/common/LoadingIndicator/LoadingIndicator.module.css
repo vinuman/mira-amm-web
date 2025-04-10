@@ -1,4 +1,4 @@
-@keyframes cycleSymbols {
+ @keyframes cycleSymbols {
   0% {
     opacity: 0;
     content: "/";
@@ -69,11 +69,21 @@
   }
 }
 
+/*  @keyframes cycleSymbols {
+  0% { content: "/"; }
+  25% { content: "-"; }
+  50% { content: "\\"; }
+  75% { content: "|"; }
+  100% { content: "/"; }
+} */
+
+
 .loadingAnimation {
   position: relative;
 }
 
 .loadingAnimation::before {
-  content: "\200B";
-  animation: cycleSymbols 4s infinite;
+  content: "/";
+  animation: cycleSymbols 1s steps(4) infinite;
+
 }
