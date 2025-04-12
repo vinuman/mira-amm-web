@@ -619,7 +619,11 @@ const Swap = ({isWidget}: {isWidget?: boolean}) => {
         >
           <div className={styles.heading}>
             <div className={styles.title}>
-              {isWidget ? <MiraTextLogo primaryColor="black" /> : <p className={"mc-type-l"}>Swap</p>}
+              {isWidget ? (
+                <MiraTextLogo primaryColor="black" />
+              ) : (
+                <p className={"mc-type-l"}>Swap</p>
+              )}
             </div>
             <SlippageSetting
               slippage={slippage}
