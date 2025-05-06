@@ -235,7 +235,7 @@
   border-radius: 20px;
 }
 
-.navItem:hover:not(.activeLink) {
+.navItem:hover:not(.active) {
   background: var(--background-grey-light);
   color: var(--content-secondary);
 }
@@ -243,7 +243,9 @@
 .navItem.active {
   color: var(--background-white);
   background-color: var(--content-primary);
-  border: 1px solid red;
+}
+.navItem.active:hover {
+  opacity: 0.9;
 }
 
 .navIndicator {

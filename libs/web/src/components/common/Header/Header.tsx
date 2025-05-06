@@ -108,28 +108,6 @@ const Header = ({isHomePage}: Props) => {
       }
     };
 
-    const getClassName = (index: number) => {
-      switch (index) {
-        case 0:
-          return clsx(
-            styles.navItem,
-            activeIndex === index && styles.activeLink,
-          );
-        case 1:
-          return clsx(
-            styles.navItem,
-            activeIndex === index && styles.activeLink,
-          );
-        case 2:
-          return clsx(
-            styles.navItem,
-            activeIndex === index && styles.activeLink,
-          );
-        default:
-          return styles.link;
-      }
-    };
-
     return (
       <div className={styles.navContainer}>
         <div className={styles.navItems}>
@@ -141,7 +119,10 @@ const Header = ({isHomePage}: Props) => {
               ref={(el) => {
                 navRefs.current[index] = el;
               }}
-              className={getClassName(index)}
+              className={clsx(
+                styles.navItem,
+                `${activeIndex === index && styles.active}`,
+              )}
               onClick={() => handleNavItemClick(index)}
             >
               {item}
@@ -157,6 +138,45 @@ const Header = ({isHomePage}: Props) => {
           </a>
         </div>
       </div>
+    );
+  };
+
+  const NavLinks = () => {
+    return (
+      <>
+        <Link
+          href="/"
+          className={clsx(styles.link, pathname === "/" && styles.activeLink)}
+        >
+          Swap
+        </Link>
+        <Link
+          href="/liquidity"
+          className={clsx(
+            styles.link,
+            pathname.includes("/liquidity") && styles.activeLink,
+          )}
+        >
+          Liquidity
+        </Link>
+        <Link
+          href="/points"
+          className={clsx(
+            styles.link,
+            pathname.includes("/points") && styles.activeLink,
+          )}
+        >
+          Points
+        </Link>
+        <a
+          href={`${FuelAppUrl}/bridge?from=eth&to=fuel&auto_close=true&=true`}
+          className={styles.link}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Bridge
+        </a>
+      </>
     );
   };
 
@@ -225,7 +245,7 @@ const Header = ({isHomePage}: Props) => {
 
       <div className={clsx("mobileOnly", styles.navMobile)}>
         <div className={clsx("mc-type-b", styles.links)}>
-          <AnimatedNavLinks />
+          <NavLinks />
         </div>
       </div>
     </header>
