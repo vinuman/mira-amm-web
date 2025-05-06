@@ -16,7 +16,7 @@ import {
 } from "@/src/utils/constants";
 import IconButton from "../IconButton/IconButton";
 import CloseIcon from "../../icons/Close/CloseIcon";
-import {useEffect, useState} from "react";
+import {useEffect, useState, useRef} from "react";
 import PointsIcon from "../../icons/Points/PointsIcon";
 
 type Props = {
@@ -31,6 +31,10 @@ const Header = ({isHomePage}: Props) => {
   const pathname = usePathname();
   const {isConnected} = useIsConnected();
   const [isPromoShown, setIsPromoShown] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const navRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+  const indicatorRef = useRef<HTMLDivElement>(null);
+  const currentPositionRef = useRef({left: 0, width: 0});
 
   useEffect(() => {
     if (!ISSERVER) {
@@ -44,42 +48,115 @@ const Header = ({isHomePage}: Props) => {
     localStorage.setItem(PROMO_BANNER_STORAGE_KEY, "true");
   };
 
-  const NavLinks = () => {
+  const navItems = ["Swap", "Liquidity", "Points"];
+
+  useEffect(() => {
+    if (pathname === "/") {
+      setActiveIndex(0);
+    } else if (pathname.includes("/liquidity")) {
+      setActiveIndex(1);
+    } else if (pathname.includes("/points")) {
+      setActiveIndex(2);
+    }
+  }, [pathname]);
+
+  useEffect(() => {
+    const currentEl = navRefs.current[activeIndex];
+    const indicator = indicatorRef.current;
+
+    if (currentEl && indicator) {
+      const {offsetLeft, offsetWidth} = currentEl;
+
+      // Store the current position before updating
+      const currentPos = currentPositionRef.current;
+
+      // Set the initial position to the current stored position
+      indicator.style.transition = "none";
+      indicator.style.left = `${currentPos.left}px`;
+      indicator.style.width = `${currentPos.width}px`;
+
+      // Force a reflow
+      indicator.offsetHeight;
+
+      // Update the stored position
+      currentPositionRef.current = {left: offsetLeft, width: offsetWidth};
+
+      // Animate to the new position
+      requestAnimationFrame(() => {
+        indicator.style.transition = "all 0.3s ease";
+        indicator.style.left = `${offsetLeft}px`;
+        indicator.style.width = `${offsetWidth}px`;
+      });
+    }
+  }, [activeIndex]);
+
+  const handleNavItemClick = (index: number) => {
+    setActiveIndex(index);
+  };
+
+  const AnimatedNavLinks = () => {
+    const getHref = (index: number) => {
+      switch (index) {
+        case 0:
+          return "/";
+        case 1:
+          return "/liquidity";
+        case 2:
+          return "/points";
+        default:
+          return "/";
+      }
+    };
+
+    const getClassName = (index: number) => {
+      switch (index) {
+        case 0:
+          return clsx(
+            styles.navItem,
+            activeIndex === index && styles.activeLink,
+          );
+        case 1:
+          return clsx(
+            styles.navItem,
+            activeIndex === index && styles.activeLink,
+          );
+        case 2:
+          return clsx(
+            styles.navItem,
+            activeIndex === index && styles.activeLink,
+          );
+        default:
+          return styles.link;
+      }
+    };
+
     return (
-      <>
-        <Link
-          href="/"
-          className={clsx(styles.link, pathname === "/" && styles.activeLink)}
-        >
-          Swap
-        </Link>
-        <Link
-          href="/liquidity"
-          className={clsx(
-            styles.link,
-            pathname.includes("/liquidity") && styles.activeLink,
-          )}
-        >
-          Liquidity
-        </Link>
-        <Link
-          href="/points"
-          className={clsx(
-            styles.link,
-            pathname.includes("/points") && styles.activeLink,
-          )}
-        >
-          Points
-        </Link>
-        <a
-          href={`${FuelAppUrl}/bridge?from=eth&to=fuel&auto_close=true&=true`}
-          className={styles.link}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Bridge
-        </a>
-      </>
+      <div className={styles.navContainer}>
+        <div className={styles.navItems}>
+          <div className={styles.navIndicator} ref={indicatorRef}></div>
+          {navItems.map((item, index) => (
+            <Link
+              key={index}
+              href={getHref(index)}
+              ref={(el) => {
+                navRefs.current[index] = el;
+              }}
+              className={getClassName(index)}
+              onClick={() => handleNavItemClick(index)}
+            >
+              {item}
+            </Link>
+          ))}
+          <a
+            href={`${FuelAppUrl}/bridge?from=eth&to=fuel&auto_close=true&=true`}
+            className={styles.link}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Bridge
+          </a>
+        </div>
+      </div>
     );
   };
 
@@ -107,9 +184,9 @@ const Header = ({isHomePage}: Props) => {
         </div>
 
         <div className={clsx(styles.center)}>
-          <div className={clsx("mc-type-l", styles.links)}>
-            <NavLinks />
-          </div>
+          {/* <div className={clsx("mc-type-l", styles.links)}> */}
+          <AnimatedNavLinks />
+          {/* </div> */}
         </div>
 
         <div className={clsx(styles.right)}>
@@ -148,7 +225,7 @@ const Header = ({isHomePage}: Props) => {
 
       <div className={clsx("mobileOnly", styles.navMobile)}>
         <div className={clsx("mc-type-b", styles.links)}>
-          <NavLinks />
+          <AnimatedNavLinks />
         </div>
       </div>
     </header>
