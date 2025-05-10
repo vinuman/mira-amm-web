@@ -86,7 +86,7 @@ const Header = ({isHomePage}: Props) => {
         currentPositionRef.current = {left: offsetLeft, width: offsetWidth};
 
         const distance = Math.abs(offsetLeft - currentPos.left);
-        const duration = Math.min(0.3, Math.max(0.1, distance / 1000)); // between 0.1s to 0.4s
+        const duration = Math.min(0.1, Math.max(0.05, distance / 1000));
 
         requestAnimationFrame(() => {
           indicator.style.transition = `all ${duration}s ease`;
