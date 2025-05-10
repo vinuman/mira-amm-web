@@ -29,9 +29,19 @@ const ISSERVER = typeof window === "undefined";
 
 const Header = ({isHomePage}: Props) => {
   const pathname = usePathname();
+  const getActiveIndexFromPath = (path: string) => {
+    if (path === "/") return 0;
+    if (path.includes("/liquidity")) return 1;
+    if (path.includes("/points")) return 2;
+    return 0;
+  };
+
   const {isConnected} = useIsConnected();
   const [isPromoShown, setIsPromoShown] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(() =>
+    getActiveIndexFromPath(pathname),
+  );
+  const [isManualUpdate, setIsManualUpdate] = useState(false);
   const navRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const indicatorRef = useRef<HTMLDivElement>(null);
   const currentPositionRef = useRef({left: 0, width: 0});
@@ -51,13 +61,7 @@ const Header = ({isHomePage}: Props) => {
   const navItems = ["Swap", "Liquidity", "Points"];
 
   useEffect(() => {
-    if (pathname === "/") {
-      setActiveIndex(0);
-    } else if (pathname.includes("/liquidity")) {
-      setActiveIndex(1);
-    } else if (pathname.includes("/points")) {
-      setActiveIndex(2);
-    }
+    setActiveIndex(getActiveIndexFromPath(pathname));
   }, [pathname]);
 
   useEffect(() => {
@@ -70,28 +74,45 @@ const Header = ({isHomePage}: Props) => {
       // Store the current position before updating
       const currentPos = currentPositionRef.current;
 
-      // Set the initial position to the current stored position
-      indicator.style.transition = "none";
-      indicator.style.left = `${currentPos.left}px`;
-      indicator.style.width = `${currentPos.width}px`;
+      if (isManualUpdate) {
+        // Manual transition (user clicked)
+        indicator.style.transition = "none";
+        indicator.style.left = `${currentPos.left}px`;
+        indicator.style.width = `${currentPos.width}px`;
 
-      // Force a reflow
-      indicator.offsetHeight;
+        // Force reflow
+        indicator.offsetHeight;
 
-      // Update the stored position
-      currentPositionRef.current = {left: offsetLeft, width: offsetWidth};
+        currentPositionRef.current = {left: offsetLeft, width: offsetWidth};
 
-      // Animate to the new position
-      requestAnimationFrame(() => {
-        indicator.style.transition = "all 0.3s ease";
+        const distance = Math.abs(offsetLeft - currentPos.left);
+        const duration = Math.min(0.3, Math.max(0.1, distance / 1000)); // between 0.1s to 0.4s
+
+        requestAnimationFrame(() => {
+          indicator.style.transition = `all ${duration}s ease`;
+          indicator.style.left = `${offsetLeft}px`;
+          indicator.style.width = `${offsetWidth}px`;
+        });
+
+        const handleTransitionEnd = () => {
+          setIsManualUpdate(false);
+          indicator.removeEventListener("transitionend", handleTransitionEnd);
+        };
+
+        indicator.addEventListener("transitionend", handleTransitionEnd);
+      } else {
+        // Passive update (e.g., route change from elsewhere)
+        indicator.style.transition = "none";
         indicator.style.left = `${offsetLeft}px`;
         indicator.style.width = `${offsetWidth}px`;
-      });
+        currentPositionRef.current = {left: offsetLeft, width: offsetWidth};
+      }
     }
-  }, [activeIndex]);
+  }, [activeIndex, isManualUpdate]);
 
   const handleNavItemClick = (index: number) => {
     setActiveIndex(index);
+    setIsManualUpdate(true);
   };
 
   const AnimatedNavLinks = () => {
