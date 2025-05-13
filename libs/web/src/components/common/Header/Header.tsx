@@ -84,7 +84,12 @@ const Header = ({isHomePage}: Props) => {
   };
 
   return (
-    <header className={styles.header}>
+    <header
+      className={clsx(
+        styles.header,
+        pathname.includes("/liquidity") && styles.headerFixed,
+      )}
+    >
       {isPromoShown && (
         <section className={styles.promo}>
           <div className={styles.promo_text}>

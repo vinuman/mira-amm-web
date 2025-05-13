@@ -19,3 +19,9 @@
     width: 50%;
   }
 }
+
+@media (max-width: 1024px) {
+  .liquidityPageContainer {
+    margin-top: 200px;
+  }
+}
