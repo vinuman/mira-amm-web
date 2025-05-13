@@ -53,6 +53,10 @@
   width: fit-content;
 }
 
+.menu {
+  display: none;
+}
+
 .walletConnected {
   cursor: pointer;
 }
@@ -73,12 +77,11 @@
   }
 }
 @media (max-width: 495px) {
-  .connectionLeft {
-    display: flex;
-    flex-direction: column;
+  .fakeSelect {
     display: none;
   }
-  .connectionContainer {
-    border: none;
+
+  .menu {
+    display: block;
   }
 }

@@ -5,6 +5,7 @@ import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 
 import styles from "./ConnectButton.module.css";
 import actionButtonStyles from "../ActionButton/ActionButton.module.css";
+import {MenuIcon} from "../../icons";
 
 import ActionButton from "@/src/components/common/ActionButton/ActionButton";
 import TransactionsHistory from "@/src/components/common/TransactionsHistory/TransactionsHistory";
@@ -220,6 +221,17 @@ const ConnectButton = ({className, isWidget}: Props) => {
               )}
             </div>
           </div>
+          {isConnected && (
+            <div
+              ref={buttonRef}
+              onClick={() => {
+                setMenuOpened((prev) => !prev);
+              }}
+              className={styles.menu}
+            >
+              <MenuIcon />
+            </div>
+          )}
         </div>
         {isMenuOpened && <DropDownMenu buttons={menuButtons} ref={menuRef} />}
         <TransactionsHistory
