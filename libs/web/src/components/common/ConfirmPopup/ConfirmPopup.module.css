@@ -92,7 +92,7 @@
 
 .buttonDeny {
   background: none;
-  color: var(--accent-primary);
+  color: var(--mc-green-2);
 }
 
 @media (max-width: 768px) {
